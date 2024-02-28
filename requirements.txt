@@ -1,3 +1,5 @@
 mysql
 mysql-connector-python
 flask
+password-strength
+bcrypt

@@ -96,6 +96,10 @@ body{
     font-size: 28px;
     padding-left:15vw;
   }
+  .labels23{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 28px;
+  }
   .label3{
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 15px;
@@ -122,11 +126,20 @@ body{
     align-items: center;
   }
 .team-image{
-    width:3vw;
+    width:2vw;
     height:3vh;
     border-radius: 10px;
     padding-left:1vw;
 }
+.logged-in{
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: left;
+  padding: 6vh;
+  padding-left:15vw;
+}
+
 .credentials-form{
     display:flex;
     flex-direction: column;
@@ -149,4 +162,22 @@ body{
     background-color: #00ABE4;
     border-radius: 10px;
     border:0;
+}
+
+.button-design2{
+  width:10vw;
+  height:5vh;
+  background-color: #00ABE4;
+  border-radius: 10px;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  color: antiquewhite;
+  border:0;
+  font-size: 100%;
+}
+
+.button-design2:hover{
+  color: #ff7a59;
+  border: #ff7a59 solid 1px;
+  background:#fff;
+  cursor: pointer;
 }

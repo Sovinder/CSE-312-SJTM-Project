@@ -36,23 +36,38 @@
         </div>
       </div>
       <div class="left-half">
-        <form class="credentials-form">Create an Account
+        {% if user_type %}
+        <div class="logged-in">
+          <p class="labels23">Welcome, {{name}}</p>
+          <p class="labels23">Team: {{team}}</p>
+          <p class="label3">Need a team?</p>
+          <label class="label3">Find a team below!</label>
+          <button class="button-design2">Find a Team</button>
+          <p></p>
+          <p></p>
+          <p></p>
+          <p></p>
+          <button class="button-design2" onclick="logout()">Logout</button>
+        </div>
+        {% else %}
+        <form class="credentials-form" action="/register" method="POST">Create an Account
           <label class="label3">Username</label>
-          <input class="input-field" type="text"/>
+          <input name="reg-username" class="input-field" type="text"/>
           <label class="label3">Password</label>
-          <input type="password" class="input-field"/>
+          <input name="reg-password" type="password" class="input-field"/>
           <label class="label3">Confirm Password</label>
-          <input type="password" class="input-field"/>
+          <input name="reg-confirm" type="password" class="input-field"/>
           <button class="login-btn" type="submit">Register</button>
         </form>
-        <form class="credentials-form">Login
+        <form class="credentials-form" action="/login" method="POST">Login
           <label class="label3">Username</label>
-          <input class="input-field" type="text"/>
+          <input class="input-field" type="text" name="log-username"/>
           <label class="label3">Password</label>
-          <input type="password" class="input-field"/>
+          <input type="password" class="input-field" name="log-password"/>
           <button class="login-btn" type="submit">Login</button>
         </form>
-      </div>
+      {% endif %}
+    </div>
   </div>
   <div class="footer">
     <p class="label34">Contact Us</p>
