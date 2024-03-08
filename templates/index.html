@@ -42,7 +42,11 @@
           <p class="labels23">Team: {{team}}</p>
           <p class="label3">Need a team?</p>
           <label class="label3">Find a team below!</label>
-          <button class="button-design2">Find a Team</button>
+          <form action="/chat" method="POST">
+            <button class="button-design2" type="submit">Find a Team/Chat</button>
+            <input name="name" value={{name}} type="hidden"/>
+            <input name="team" value={{team}} type="hidden"/>
+          </form>
           <p></p>
           <p></p>
           <p></p>

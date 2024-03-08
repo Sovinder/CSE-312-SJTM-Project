@@ -2,10 +2,11 @@ from flask import Flask
 from flask import render_template
 from flask import make_response
 from flask import request
-import mysql.connector
+from flask import redirect
 from util import validate_password
 from util import generate_auth_token
 import bcrypt
+import mysql.connector
 
 
 app = Flask(__name__,static_url_path='/static')
@@ -44,6 +45,71 @@ def home():
     response.headers['Content-Type'] = 'text/html'
     response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
+
+@app.route("/chat-message",methods=['POST'])
+def chat_message():
+    username="Guest"
+    username = request.form.get('username')
+    team = request.form.get('team')
+    message = request.form.get('message')
+    user_type_cookie = request.cookies.get('auth')
+    if(user_type_cookie=="0" or user_type_cookie==0):
+        user_type_cookie=None
+    if user_type_cookie != None:
+        try:
+            conn = mysql.connector.connect(
+                user = 'user',
+                password = 'password',
+                host = 'db',
+                database = 'db'
+            )
+            cursor = conn.cursor()
+        except mysql.connector.Error as e:
+            print(f"Error: {e}")
+        user_query = "SELECT * FROM user WHERE auth_token=%s"
+        values = (user_type_cookie,)
+        cursor.execute(user_query,values)
+        result = cursor.fetchall()
+        username = result[0][1]
+        if(username!="Guest"):
+            create_table = "CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTO_INCREMENT,username TEXT NOT NULL,team TEXT NOT NULL,message TEXT NOT NULL);"
+            cursor.execute(create_table)
+            conn.commit()
+            insert_query = "INSERT INTO messages (username, team,message) VALUES (%s,%s,%s);"
+            values = (username, team, message)
+            cursor.execute(insert_query, values)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return redirect('/chat')
+    else:
+        return "Error: Not logged in", 400
+
+@app.route("/chat",methods=['POST','GET'])
+def chat():
+    if request.method == 'POST' or 'GET':
+        username = request.form.get('name')
+        team = request.form.get('team')
+        try:
+            conn = mysql.connector.connect(
+                user = 'user',
+                password = 'password',
+                host = 'db',
+                database = 'db'
+            )
+            cursor = conn.cursor()
+        except mysql.connector.Error as e:
+            print(f"Error: {e}")
+        try:
+            select_query = "SELECT * FROM messages"
+            cursor.execute(select_query)
+            result = cursor.fetchall()
+        except:
+            result = []
+        response = make_response(render_template('chat.html',name=username,team=team,messages=result))
+        response.headers['Content-Type'] = 'text/html'
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        return response
 
 @app.route("/register", methods=['POST'])
 def register():
