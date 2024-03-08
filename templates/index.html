@@ -51,7 +51,9 @@
           <p></p>
           <p></p>
           <p></p>
-          <button class="button-design2" onclick="logout()">Logout</button>
+          <form  method="post" action="/logout">
+            <button class="button-design2" type="submit">Logout</button>
+          </form>
         </div>
         {% else %}
         <form class="credentials-form" action="/register" method="POST">Create an Account

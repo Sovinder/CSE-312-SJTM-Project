@@ -219,12 +219,8 @@ def logout():
         conn.commit()
         cursor.close()
         conn.close()
-        response = make_response(render_template('index.html'))
-        response.headers['Content-Type'] = 'text/html'
-        response.headers['X-Content-Type-Options'] = 'nosniff'
-        response.headers['Location'] = '/'
+        response = make_response(redirect('/'))
         response.set_cookie('auth',"0",max_age=0,httponly=True)
-        response.status_code = 302
         return response
 
 if __name__ == "__main__":
