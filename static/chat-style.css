@@ -60,6 +60,7 @@ body{
     overflow:scroll;
     height:70vh;
     padding-left:2%;
+    background-color: #D4F1F4;
 }
 .chat-room-text{
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
@@ -132,12 +133,15 @@ body{
     color:black;
 }
 .user-message {
-    background-color: #4CAF50;
-    color: white;
-    border-radius: 8px;
-    padding: 8px;
-    max-width: 80%;
+    background-color: white;
+    color: black;
+    border-radius: 5px;
+    padding: 0.5%;
+    max-width: 95%;
     word-wrap: break-word;
     float: right;
-    margin-bottom:10px;
+    margin-bottom:1px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 14px;
+    box-shadow: black 1px 1px;
 }

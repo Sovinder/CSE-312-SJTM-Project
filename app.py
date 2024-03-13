@@ -5,6 +5,7 @@ from flask import request
 from flask import redirect
 from util import validate_password
 from util import generate_auth_token
+from flask import jsonify
 import bcrypt
 import mysql.connector
 
@@ -44,6 +45,33 @@ def home():
     response = make_response(render_template('index.html',user_type=user_type_cookie,name=username,team="None"))
     response.headers['Content-Type'] = 'text/html'
     response.headers['X-Content-Type-Options'] = 'nosniff'
+    return response
+
+@app.route("/chat-update")
+def update_chat():
+    try:
+        conn = mysql.connector.connect(
+            user = 'user',
+            password = 'password',
+            host = 'db',
+            database = 'db'
+        )
+        cursor = conn.cursor()
+    except mysql.connector.Error as e:
+        print(f"Error: {e}")
+    try:
+        select_query = "SELECT * FROM messages"
+        cursor.execute(select_query)
+        result = cursor.fetchall()
+    except:
+        result = []
+    conn.commit()
+    cursor.close()
+    conn.close()
+    data  = {
+        'messages':result
+    }
+    response = jsonify(data)
     return response
 
 @app.route("/chat-message",methods=['POST'])
@@ -87,7 +115,7 @@ def chat_message():
 
 @app.route("/chat",methods=['POST','GET'])
 def chat():
-    if request.method == 'POST' or 'GET':
+    if request.method == 'POST' or request.method == 'GET':
         username = request.form.get('name')
         team = request.form.get('team')
         try:
@@ -106,11 +134,15 @@ def chat():
             result = cursor.fetchall()
         except:
             result = []
+        conn.commit()
+        cursor.close()
+        conn.close()
         response = make_response(render_template('chat.html',name=username,team=team,messages=result))
-        response.headers['Content-Type'] = 'text/html'
+        response.headers['Content-ype'] = 'text/html'
         response.headers['X-Content-Type-Options'] = 'nosniff'
         return response
-
+        
+        
 @app.route("/register", methods=['POST'])
 def register():
     username = request.form.get('reg-username')
