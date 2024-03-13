@@ -116,8 +116,31 @@ def chat_message():
 @app.route("/chat",methods=['POST','GET'])
 def chat():
     if request.method == 'POST' or request.method == 'GET':
-        username = request.form.get('name')
-        team = request.form.get('team')
+        if request.method == 'POST':
+            username = request.form.get('name')
+            team = request.form.get('team')
+        else:
+            user_type_cookie = request.cookies.get('auth')
+            if(user_type_cookie=="0" or user_type_cookie==0):
+                user_type_cookie=None
+                return redirect("/")
+            if user_type_cookie != None:
+                try:
+                    conn = mysql.connector.connect(
+                        user = 'user',
+                        password = 'password',
+                        host = 'db',
+                        database = 'db'
+                    )
+                    cursor = conn.cursor()
+                except mysql.connector.Error as e:
+                    print(f"Error: {e}")
+            user_query = "SELECT * FROM user WHERE auth_token=%s"
+            values = (user_type_cookie,)
+            cursor.execute(user_query,values)
+            result = cursor.fetchall()
+            username = result[0][1]
+            team = 'None'
         try:
             conn = mysql.connector.connect(
                 user = 'user',
