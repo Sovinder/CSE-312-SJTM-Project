@@ -1,143 +1,144 @@
-body{
+body {
     overflow: hidden;
-    border:0px;
-    margin:0;
-    padding:0;
+    border: 0px;
+    margin: 0;
+    padding: 0;
 }
-.chat-body{
-    display:flex;
+.chat-body {
+    display: flex;
     flex-direction: row;
-    height:95vh;
-    width:100vw;
+    height: 95vh;
+    width: 100vw;
     justify-content: center;
     align-items: center;
 }
 
-.body-div{
-    width:100vw;
-    height:100vh;
-    display:flex;
+.body-div {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
     flex-direction: column;
     justify-content: center;
 }
-.banner{
-    width:100vw;
-    height:5vw;
-    background-color: #00ABE4;
-    display:flex;
+.banner {
+    width: 100vw;
+    height: 5vw;
+    background-color: #00abe4;
+    display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: row;
 }
 
-.chat-left{
-    display:flex;
-    width:50vw;
-    height:95vh;
+.chat-left {
+    display: flex;
+    width: 50vw;
+    height: 95vh;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding-left:2%;
+    padding-left: 2%;
 }
 
-.chat-right{
-    display:flex;
-    width:50vw;
-    height:95vh;
+.chat-right {
+    display: flex;
+    width: 50vw;
+    height: 95vh;
     flex-direction: column;
     justify-content: top;
     align-items: center;
-    padding-left:5%;
-    padding-top:5vh;
+    padding-left: 5%;
+    padding-top: 5vh;
 }
 
-.chat-room{
-    width:100%;
-    border:solid 3px #00ABE4;
+.chat-room {
+    width: 100%;
+    border: solid 3px #00abe4;
     border-radius: 10px;
-    display:flex;
+    display: flex;
     flex-direction: column;
     overflow:scroll;
     height:70vh;
     padding-left:2%;
     background-color: #D4F1F4;
 }
-.chat-room-text{
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+.chat-room-text {
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
     font-size: 20px;
-    color:black;
+    color: black;
 }
-.title-text{
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+.title-text {
+    position: fixed;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
     font-size: 30px;
-    color:white;
+    color: white;
 }
-.profile-text{
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+.profile-text {
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
     font-size: 16px;
-    color:black;
+    color: black;
 }
-.chat-form{
-    display:flex;
-    flex-direction:row;
+.chat-form {
+    display: flex;
+    flex-direction: row;
     justify-content: left;
     align-items: center;
-    width:50vw;
-    height:5vh;
-    padding-top:1%;
+    width: 50vw;
+    height: 5vh;
+    padding-top: 1%;
 }
-.chat-box{
-    width:35vw;
-    height:5vh;
+.chat-box {
+    width: 35vw;
+    height: 5vh;
     border-radius: 10px;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
     font-size: 16px;
-    color:black;
+    color: black;
 }
-.chat-button{
-    width:10vw;
-    height:5vh;
-    background-color: #00ABE4;
+.chat-button {
+    width: 10vw;
+    height: 5vh;
+    background-color: #00abe4;
     border-radius: 10px;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
     color: antiquewhite;
-    border:0;
+    border: 0;
     font-size: 100%;
-    padding-left:1%;
-  }
-  
-  .chat-button:hover{
+    padding-left: 1%;
+}
+
+.chat-button:hover {
     color: #ff7a59;
     border: #ff7a59 solid 1px;
-    background:#fff;
+    background: #fff;
     cursor: pointer;
-  }
-  .profile-form{
-    display:flex;
+}
+.profile-form {
+    display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    height:10vh;
-    width:100%; 
-  }
-
-.profile-image{
-    width:2vw;
-    height:3vh;
-    border-radius: 10px;
-    padding-left:1vw;
+    height: 10vh;
+    width: 100%;
 }
-.profile-header{
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+
+.profile-image {
+    width: 2vw;
+    height: 3vh;
+    border-radius: 10px;
+    padding-left: 1vw;
+}
+.profile-header {
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
     font-size: 25px;
-    color:black;
+    color: black;
 }
 .user-message {
-    background-color: white;
-    color: black;
-    border-radius: 5px;
-    padding: 0.5%;
-    max-width: 95%;
+    background-color: #4caf50;
+    color: white;
+    border-radius: 8px;
+    padding: 8px;
+    max-width: 80%;
     word-wrap: break-word;
     float: right;
     margin-bottom:1px;
@@ -157,3 +158,4 @@ body{
     border-radius: 5px;
     cursor: pointer;
 }
+
