@@ -145,3 +145,15 @@ body{
     font-size: 14px;
     box-shadow: black 1px 1px;
 }
+
+.back-button {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #abeaff;
+    color: #000000;
+    border-radius: 5px;
+    cursor: pointer;
+}
