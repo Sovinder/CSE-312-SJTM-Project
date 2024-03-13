@@ -141,7 +141,10 @@ body {
     max-width: 80%;
     word-wrap: break-word;
     float: right;
-    margin-bottom: 10px;
+    margin-bottom:1px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 14px;
+    box-shadow: black 1px 1px;
 }
 
 .back-button {
@@ -155,3 +158,4 @@ body {
     border-radius: 5px;
     cursor: pointer;
 }
+
