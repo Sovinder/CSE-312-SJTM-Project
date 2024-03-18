@@ -20,6 +20,8 @@
                 <div class="chat-room" id="chat-room">
                   {% for message in messages %}
                     <p class="user-message">{{ message[1] }} | Team {{ message[2] }}: {{ message[3] }}</p>
+                    <p class="like-text">Likes: <span class="like-counter" id="likes-{{ message[0] }}">0</span></p>
+                    <button class="like-button" onclick="likeMessage('{{ message[0] }}')">Like</button>
                   {% endfor %}
                 </div>
               <form class="chat-form" action="/chat-message" method="post">

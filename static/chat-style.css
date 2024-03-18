@@ -157,3 +157,16 @@ body{
     border-radius: 5px;
     cursor: pointer;
 }
+
+.like-button {
+    background-color: #3498db; 
+    color: #fff; 
+    border: none; 
+    padding: 5px 10px; 
+    cursor: pointer; 
+    border-radius: 5px; 
+}
+
+.like-button:hover {
+    background-color: #2980b9; 
+}
