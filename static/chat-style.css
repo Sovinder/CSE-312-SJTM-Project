@@ -158,7 +158,14 @@ body{
     cursor: pointer;
 }
 
+.like-text{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 10px;
+    color:white;
+}
+
 .like-button {
+    float: left;
     background-color: #3498db; 
     color: #fff; 
     border: none; 
@@ -170,3 +177,4 @@ body{
 .like-button:hover {
     background-color: #2980b9; 
 }
+

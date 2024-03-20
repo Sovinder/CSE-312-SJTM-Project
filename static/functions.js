@@ -53,5 +53,6 @@ function updateChatRoom(messages) {
 function pollChat() {
    updateChatRoom(); 
 }
+
 setInterval(pollChat, 2000);
 pollChat();
