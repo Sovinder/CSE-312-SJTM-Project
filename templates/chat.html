@@ -19,12 +19,7 @@
               <p class="chat-room-text">Chat Room</p>
                 <div class="chat-room" id="chat-room">
                   {% for message in messages %}
-                  <div class="comment">
                     <p class="user-message">{{ message[1] }} | Team {{ message[2] }}: {{ message[3] }}</p>
-                    <div class="like">
-                      <button type="submit" name="like-buttton"  class="like-button">Like</button>
-                    </div>
-                  </div>
                   {% endfor %}
                 </div>
               <form class="chat-form" action="/chat-message" method="post">

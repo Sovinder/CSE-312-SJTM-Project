@@ -11,13 +11,13 @@ function sportsOffered(){
 //function to start the chat box at the bottom
 document.addEventListener('DOMContentLoaded', function() {
     var scrollContainer = document.querySelector('.chat-room');
-    
+
     // Scroll to the bottom on page load
     scrollContainer.scrollTop = scrollContainer.scrollHeight;
-  
+
     // Additional code for dynamic content or user interaction
   });
-  
+
 window.onload = sportsOffered;
 
 function updateChatRoom(messages) {
@@ -74,7 +74,7 @@ function updateChatRoom(messages) {
                 //adding the hidden elements to be issued during post request
             });
             var scrollContainer = document.querySelector('.chat-room');
-                
+
                 // Scroll to the bottom on page load
             scrollContainer.scrollTop = scrollContainer.scrollHeight;
         }
@@ -84,8 +84,7 @@ function updateChatRoom(messages) {
 }
 
 function pollChat() {
-   updateChatRoom(); 
+   updateChatRoom();
 }
-
 setInterval(pollChat, 2000);
 pollChat();
