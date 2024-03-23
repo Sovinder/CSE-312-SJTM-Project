@@ -8,6 +8,7 @@ from util import generate_auth_token
 from flask import jsonify
 import bcrypt
 import mysql.connector
+import hashlib
 
 
 app = Flask(__name__,static_url_path='/static')
@@ -34,18 +35,114 @@ def home():
             cursor = conn.cursor()
         except mysql.connector.Error as e:
             print(f"Error: {e}")
-        user_query = "SELECT * FROM user WHERE auth_token=%s"
-        values = (user_type_cookie,)
-        cursor.execute(user_query,values)
+        query = "SELECT * FROM user"
+        cursor.execute(query)
         result = cursor.fetchall()
-        username = result[0][1]
+        username =''
+        print(result)
+        for user in result:
+            print(user)
+            if(hashlib.sha256(user_type_cookie.encode('utf-8')).hexdigest() == user[3]):
+                username = user[1]
+                break
         conn.commit()
         cursor.close()
         conn.close()
+    if username == '':
+        user_type_cookie = None
     response = make_response(render_template('index.html',user_type=user_type_cookie,name=username,team="None"))
     response.headers['Content-Type'] = 'text/html'
     response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
+
+@app.route("/like",methods=['POST'])
+def like():
+    id = request.form.get('id')
+    user_cookie = request.cookies.get('auth')
+    if (user_cookie != 0 and user_cookie != '0' and user_cookie != None):
+        try:
+            conn = mysql.connector.connect(
+                user = 'user',
+                password = 'password',
+                host = 'db',
+                database = 'db'
+            )
+            cursor = conn.cursor()
+        except mysql.connector.Error as e:
+            print(f"Error: {e}")
+        query = "SELECT * FROM user"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        username =''
+        for user in result:
+            if(hashlib.sha256(user_cookie.encode('utf-8')).hexdigest() == user[3]):
+                username = user[1]
+                break
+        #SETUP A TABLE FOR LIKES
+        user_like_table = "CREATE TABLE IF NOT EXISTS user_likes (id INTEGER, username TEXT NOT NULL, like_count INTEGER);"
+        cursor.execute(user_like_table)
+        conn.commit()
+        #check if already a record of liking
+        query = "SELECT * FROM user_likes WHERE id=%s AND username=%s"
+        values = (id, username)
+        cursor.execute(query,values)
+        result = cursor.fetchall()
+        #if there already is a record of a like from this user on the specific message
+        if len(result) != 0:
+            new_value = 0
+            current_value = result[0][2]
+            if current_value == 1:
+                new_value = 0
+                query = "SELECT * FROM likes WHERE id=%s;"
+                values = (id,)
+                cursor.execute(query,values)
+                result = cursor.fetchall()
+                current = result[0][1]
+                current = current - 1
+                query = "UPDATE likes SET count=%s WHERE id=%s;"
+                values = (current,id)
+                cursor.execute(query,values)
+                conn.commit()
+            else:
+                new_value = 1
+                query = "SELECT * FROM likes WHERE id=%s;"
+                values = (id,)
+                cursor.execute(query,values)
+                result = cursor.fetchall()
+                current = result[0][1]
+                current = current + 1
+                query = "UPDATE likes SET count=%s WHERE id=%s;"
+                values = (current,id)
+                cursor.execute(query,values)
+                conn.commit()
+            query  = "UPDATE user_likes SET like_count=%s WHERE id=%s AND username=%s"
+            values = (new_value, id, username)
+            cursor.execute(query,values)
+            conn.commit()
+        else:
+            query = "INSERT INTO user_likes (id,username,like_count) VALUES (%s,%s,%s);"
+            values = (id,username,'1')
+            cursor.execute(query,values)
+            conn.commit()
+            query = "SELECT * FROM likes WHERE id=%s;"
+            values = (id,)
+            cursor.execute(query,values)
+            result = cursor.fetchall()
+            current = result[0][1]
+            current = current + 1
+            query = "UPDATE likes SET count=%s WHERE id=%s;"
+            values = (current,id)
+            cursor.execute(query,values)
+            conn.commit()
+        response = jsonify({"message": "Success, like entered"})
+    
+    # Redirect to another route
+        return redirect('/chat'), 302
+    else:
+        response = jsonify({"message": "Need to be logged in"})
+    
+    # Redirect to another route
+        return redirect('/'), 302
 
 @app.route("/chat-update")
 def update_chat():
@@ -63,13 +160,18 @@ def update_chat():
         select_query = "SELECT * FROM messages"
         cursor.execute(select_query)
         result = cursor.fetchall()
+        like_query = "SELECT * FROM likes"
+        cursor.execute(like_query)
+        result2 = cursor.fetchall()
     except:
         result = []
+        result2 = []
     conn.commit()
     cursor.close()
     conn.close()
     data  = {
-        'messages':result
+        'messages':result,
+        'likes':result2
     }
     response = jsonify(data)
     return response
@@ -94,24 +196,40 @@ def chat_message():
             cursor = conn.cursor()
         except mysql.connector.Error as e:
             print(f"Error: {e}")
-        user_query = "SELECT * FROM user WHERE auth_token=%s"
-        values = (user_type_cookie,)
-        cursor.execute(user_query,values)
+        query = "SELECT * FROM user"
+        cursor.execute(query)
         result = cursor.fetchall()
-        username = result[0][1]
+        username =''
+        for user in result:
+            if(hashlib.sha256(user_type_cookie.encode('utf-8')).hexdigest() == user[3]):
+                username = user[1]
+                break
         if(username!="Guest"):
+            #CREATING THE MESSAGES TABLE THAT EACH HAVE A SPECIFIC ID
             create_table = "CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTO_INCREMENT,username TEXT NOT NULL,team TEXT NOT NULL,message TEXT NOT NULL);"
             cursor.execute(create_table)
             conn.commit()
+            #CREATING THE LIKE TABLE THAT WILL USE THE SPECIFIC ID AND HAVE LIKE COUNTER
+            create_like_table = "CREATE TABLE IF NOT EXISTS likes (id INTEGER PRIMARY KEY, count INTEGER);"
+            cursor.execute(create_like_table)
+            conn.commit()
+            #INSERTING A MESSAGE
             insert_query = "INSERT INTO messages (username, team,message) VALUES (%s,%s,%s);"
             values = (username, team, message)
             cursor.execute(insert_query, values)
+            conn.commit()
+            #TAKING THE NEW MESSAGE ID AND ESTABLISHING ZERO LIKES IN LIKE TABLE
+            last_inserted_id = cursor.lastrowid
+            insert_likes = "INSERT INTO likes (id, count) VALUES (%s,%s);"
+            values = (last_inserted_id,'0')
+            cursor.execute(insert_likes, values)
+            conn.commit()
         conn.commit()
         cursor.close()
         conn.close()
         return redirect('/chat')
     else:
-        return "Error: Not logged in", 400
+        return redirect("/")
 
 @app.route("/chat",methods=['POST','GET'])
 def chat():
@@ -121,9 +239,11 @@ def chat():
             team = request.form.get('team')
         else:
             user_type_cookie = request.cookies.get('auth')
-            if(user_type_cookie=="0" or user_type_cookie==0):
+            if(user_type_cookie=="0" or user_type_cookie==0 or user_type_cookie==None):
                 user_type_cookie=None
-                return redirect("/")
+                response = jsonify({"message": "Need to be logged in"})
+                return redirect('/'), 302
+
             if user_type_cookie != None:
                 try:
                     conn = mysql.connector.connect(
@@ -135,12 +255,21 @@ def chat():
                     cursor = conn.cursor()
                 except mysql.connector.Error as e:
                     print(f"Error: {e}")
-            user_query = "SELECT * FROM user WHERE auth_token=%s"
-            values = (user_type_cookie,)
-            cursor.execute(user_query,values)
-            result = cursor.fetchall()
-            username = result[0][1]
-            team = 'None'
+                query = "SELECT * FROM user"
+                cursor.execute(query)
+                result = cursor.fetchall()
+                username =''
+                team = 'None'
+                for user in result:
+                    if(hashlib.sha256(user_type_cookie.encode('utf-8')).hexdigest() == user[3]):
+                        username = user[1]
+                        break
+            #user_query = "SELECT * FROM user WHERE auth_token=%s"
+            #values = (user_type_cookie,)
+            #cursor.execute(user_query,values)
+            #result = cursor.fetchall()
+            #username = result[0][1]
+            #team = 'None'
         try:
             conn = mysql.connector.connect(
                 user = 'user',
@@ -197,24 +326,29 @@ def register():
         print("Need a unique username")
         return "Error: Username must be unique", 400
     else:
-        if(password == confirm_password and len(validate_password(password))==0):
-            auth_token = bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt())
-            hash = auth_token.decode()
-            safe_username = username.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
-            register_query = "INSERT INTO user (username, password, auth_token) VALUES(%s,%s,%s)"
-            values = (safe_username,hash,"0")
-            cursor.execute(register_query,values)
-            conn.commit()
-            cursor.close()
-            conn.close()
-            response = make_response(render_template('index.html'))
-            response.headers['Content-Type'] = 'text/html'
-            response.headers['X-Content-Type-Options'] = 'nosniff'
-            response.headers['Location'] = '/'
-            response.status_code = 302
-            return response
+        if(password == confirm_password):
+            if (len(validate_password(password))==0):
+                auth_token = bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt())
+                hash = auth_token.decode('utf-8')
+                safe_username = username.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
+                register_query = "INSERT INTO user (username, password, auth_token) VALUES(%s,%s,%s)"
+                values = (safe_username,hash,"0")
+                cursor.execute(register_query,values)
+                conn.commit()
+                cursor.close()
+                conn.close()
+                response = make_response(render_template('index.html'))
+                response.headers['Content-Type'] = 'text/html'
+                response.headers['X-Content-Type-Options'] = 'nosniff'
+                response.headers['Location'] = '/'
+                response.status_code = 302
+                return response
+            else:
+                register_error = "Password too weak. Look at requirements and try again."
+                return render_template('index.html', register_error=register_error)
         else:
-            return "Error: Passwords do not match or dont meet criteria" + password + username, 400
+            register_error = "Passwords do not match. Try again."
+            return render_template('index.html', register_error=register_error)
 
 
 @app.route("/login",methods=['POST'])          
@@ -235,24 +369,31 @@ def login():
     values = (username,)
     cursor.execute(check_account_query,values)
     result = cursor.fetchall()
-    hashed_password = result[0][2]
-    if(bcrypt.checkpw(password.encode("utf-8"),hashed_password.encode("utf-8"))):
-        auth_token = generate_auth_token(64)
-        insert_auth_query = "UPDATE user SET auth_token=%s WHERE username=%s"
-        values = (auth_token,username)
-        cursor.execute(insert_auth_query,values)
-        conn.commit()
-        cursor.close()
-        conn.close()
-        response = make_response(render_template('index.html'))
-        response.headers['Content-Type'] = 'text/html'
-        response.headers['X-Content-Type-Options'] = 'nosniff'
-        response.headers['Location'] = '/'
-        response.set_cookie('auth',auth_token,max_age=3600,httponly=True)
-        response.status_code = 302
-        return response
+    if result:
+        hashed_password = result[0][2]
+        if(bcrypt.checkpw(password.encode("utf-8"),hashed_password.encode("utf-8"))):
+            auth_token = generate_auth_token(32)
+            h = hashlib.sha256(auth_token.encode('utf-8')).hexdigest()
+            print(h)
+            insert_auth_query = "UPDATE user SET auth_token=%s WHERE username=%s"
+            values = (h,username)
+            cursor.execute(insert_auth_query,values)
+            conn.commit()
+            cursor.close()
+            conn.close()
+            response = make_response(render_template('index.html'))
+            response.headers['Content-Type'] = 'text/html'
+            response.headers['X-Content-Type-Options'] = 'nosniff'
+            response.headers['Location'] = '/'
+            response.set_cookie('auth',auth_token,max_age=3600,httponly=True)
+            response.status_code = 302
+            return response
+        else:
+            login_error = "Invalid username or password. Try again."
+            return render_template('index.html', login_error=login_error)
     else:
-        return "Error: Invalid login", 400
+        login_error = "Invalid username or password. Try again."
+        return render_template('index.html', login_error=login_error)
 
 @app.route("/logout",methods=['POST'])
 def logout():
@@ -268,8 +409,17 @@ def logout():
             cursor = conn.cursor()
         except mysql.connector.Error as e:
             print(f"Error: {e}")
-        logout_query = "UPDATE user SET auth_token=%s WHERE auth_token=%s"
-        values = (user_type_cookie,user_type_cookie)
+        query = "SELECT * FROM user"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        username =''
+        for user in result:
+            if(hashlib.sha256(user_type_cookie.encode('utf-8')).hexdigest() == user[3]):
+                username = user[1]
+                break
+        #after we find out which user it is
+        logout_query = "UPDATE user SET auth_token=%s WHERE username=%s"
+        values = ("0",username)
         cursor.execute(logout_query,values)
         conn.commit()
         cursor.close()
