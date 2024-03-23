@@ -343,6 +343,12 @@ def register():
                 response.headers['Location'] = '/'
                 response.status_code = 302
                 return response
+            else:
+                register_error = "Password too weak. Look at requirements and try again."
+                return render_template('index.html', register_error=register_error)
+        else:
+            register_error = "Passwords do not match. Try again."
+            return render_template('index.html', register_error=register_error)
 
 
 @app.route("/login",methods=['POST'])          
@@ -382,6 +388,12 @@ def login():
             response.set_cookie('auth',auth_token,max_age=3600,httponly=True)
             response.status_code = 302
             return response
+        else:
+            login_error = "Invalid username or password. Try again."
+            return render_template('index.html', login_error=login_error)
+    else:
+        login_error = "Invalid username or password. Try again."
+        return render_template('index.html', login_error=login_error)
 
 @app.route("/logout",methods=['POST'])
 def logout():
