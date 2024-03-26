@@ -187,3 +187,8 @@ body{
     background:#fff;
     cursor: pointer;
   }
+.chat-profile-image{
+    width:50%;
+    height:auto;
+    border-radius:10px;
+}

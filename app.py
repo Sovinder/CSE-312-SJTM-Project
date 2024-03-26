@@ -315,6 +315,7 @@ def chat():
         if request.method == 'POST':
             username = request.form.get('name')
             team = request.form.get('team')
+            profile = request.form.get('profile')
         else:
             user_type_cookie = request.cookies.get('auth')
             if(user_type_cookie=="0" or user_type_cookie==0 or user_type_cookie==None):
@@ -367,7 +368,7 @@ def chat():
         conn.commit()
         cursor.close()
         conn.close()
-        response = make_response(render_template('chat.html',name=username,team=team,messages=result))
+        response = make_response(render_template('chat.html',name=username,team=team,messages=result,profile=profile))
         response.headers['Content-ype'] = 'text/html'
         response.headers['X-Content-Type-Options'] = 'nosniff'
         return response
