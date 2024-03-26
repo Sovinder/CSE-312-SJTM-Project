@@ -40,9 +40,9 @@
         <div class="logged-in">
           <p class="labels23">Welcome, {{name}}</p>
           <p class="labels23">Team: {{team}}</p>
-          <form action="/profile" method="post" enctype="multipart/form-data">
+          <form action="/profile" class="profile-form" method="post" enctype="multipart/form-data">
             <input type="file" name="profilePic" id="profilePic"/>
-            <img id="preview" class="null" src="../static/null.png"/>
+            <img id="preview" class="null" src={{profile}}/>
             <button type="submit" class="profile-button">Upload Profile Picture</button>
           </form>
           <label class="label3">Chat with other users below!</label>

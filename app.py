@@ -5,6 +5,7 @@ from flask import request
 from flask import redirect
 from util import validate_password
 from util import generate_auth_token
+from util import count_files_in_folder
 from flask import jsonify
 import bcrypt
 import mysql.connector
@@ -21,6 +22,7 @@ def add_headers(response):
 @app.route("/")
 def home():
     username="Guest"
+    path="None"
     user_type_cookie = request.cookies.get('auth')
     if(user_type_cookie=="0" or user_type_cookie==0):
         user_type_cookie=None
@@ -46,15 +48,91 @@ def home():
                 username = user[1]
                 break
         conn.commit()
+        create_table = "CREATE TABLE IF NOT EXISTS profiles (username TEXT, path TEXT)"
+        cursor.execute(create_table)
+        conn.commit()
+        select = "SELECT * FROM profiles WHERE username=%s"
+        values = (username,)
+        cursor.execute(select,values)
+        result = cursor.fetchall()
+        if len(result) > 0:
+            path = result[0][1]
+        else:
+            path = "../static/null.png"
+        conn.commit()
         cursor.close()
         conn.close()
     if username == '':
         user_type_cookie = None
-    response = make_response(render_template('index.html',user_type=user_type_cookie,name=username,team="None"))
+        path = "None"
+    response = make_response(render_template('index.html',user_type=user_type_cookie,name=username,team="None",profile=path))
     response.headers['Content-Type'] = 'text/html'
     response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
+@app.route("/profile",methods=['POST'])
+def profile():
+    user_type_cookie = request.cookies.get('auth')
+    if(user_type_cookie=="0" or user_type_cookie==0):
+        user_type_cookie=None
+    if user_type_cookie != None:
+        try:
+            conn = mysql.connector.connect(
+                user = 'user',
+                password = 'password',
+                host = 'db',
+                database = 'db'
+            )
+            cursor = conn.cursor()
+        except mysql.connector.Error as e:
+            print(f"Error: {e}")
+        query = "SELECT * FROM user"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        username =''
+        print(result)
+        for user in result:
+            print(user)
+            if(hashlib.sha256(user_type_cookie.encode('utf-8')).hexdigest() == user[3]):
+                username = user[1]
+                break
+        conn.commit()
+    if username == '':
+        user_type_cookie = None
+    #ADDING A NEW TABLE FOR ALL PROFILE PIC PATHS
+    if 'profilePic' not in request.files:
+        return 404, 'No file uploaded'
+    else:
+        file = request.files['profilePic']
+        if file.filename =='':
+            return 404,'No selected file'
+        else:
+            num = count_files_in_folder("../static/profiles")
+            file_path = 'static/profiles/image' + str(num)
+            file_bytes = file.read()
+            with open(file_path, 'wb') as f:
+                f.write(file_bytes)
+            #putting in a sql table
+            create_table = "CREATE TABLE IF NOT EXISTS profiles (username TEXT, path TEXT)"
+            cursor.execute(create_table)
+            conn.commit()
+            query = "SELECT * FROM profiles WHERE username=%s"
+            values = (username,)
+            cursor.execute(query,values)
+            result = cursor.fetchall()
+            if len(result) > 0:
+                update = "UPDATE profiles SET path=%s WHERE username=%s"
+                values = (file_path,username)
+                cursor.execute(update,values)
+            else:
+                insert = "INSERT INTO profiles (username,path) VALUES (%s,%s)"
+                values = (username,file_path)
+                cursor.execute(insert,values)
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return redirect("/")
+            
 @app.route("/like",methods=['POST'])
 def like():
     id = request.form.get('id')
