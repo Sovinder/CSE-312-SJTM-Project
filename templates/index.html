@@ -40,15 +40,17 @@
         <div class="logged-in">
           <p class="labels23">Welcome, {{name}}</p>
           <p class="labels23">Team: {{team}}</p>
-          <p class="label3">Need a team?</p>
-          <label class="label3">Find a team below!</label>
+          <form action="/profile" method="post" enctype="multipart/form-data">
+            <input type="file" name="profilePic" id="profilePic"/>
+            <img id="preview" class="null" src="../static/null.png"/>
+            <button type="submit" class="profile-button">Upload Profile Picture</button>
+          </form>
+          <label class="label3">Chat with other users below!</label>
           <form action="/chat" method="POST">
             <button class="button-design2" type="submit" onclick="updateChatRoom()">Find a Team/Chat</button>
             <input name="name" value={{name}} type="hidden"/>
             <input name="team" value={{team}} type="hidden"/>
           </form>
-          <p></p>
-          <p></p>
           <p></p>
           <p></p>
           <form  method="post" action="/logout">

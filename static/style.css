@@ -231,3 +231,24 @@ padding-left: 15vw;
 font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 font-size: 15px;
 }
+.null{
+  width:50%;
+  height:auto;
+  border-radius: 10px;
+}
+.profile-button{
+  color:antiquewhite;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-size:small;
+  border:0px;
+  border-radius:5px;
+  background:#00ABE4;
+}
+
+.profile-button:hover{
+  color: #ff7a59;
+  border: #ff7a59 solid 1px;
+  background:#fff;
+  cursor: pointer;
+  }
+
