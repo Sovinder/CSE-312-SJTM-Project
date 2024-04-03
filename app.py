@@ -132,7 +132,7 @@ def profile():
             cursor.close()
             conn.close()
             return redirect("/")
-            
+
 @app.route("/like",methods=['POST'])
 def like():
     id = request.form.get('id')
@@ -213,12 +213,12 @@ def like():
             cursor.execute(query,values)
             conn.commit()
         response = jsonify({"message": "Success, like entered"})
-    
+
     # Redirect to another route
         return redirect('/chat'), 302
     else:
         response = jsonify({"message": "Need to be logged in"})
-    
+
     # Redirect to another route
         return redirect('/'), 302
 
@@ -372,8 +372,8 @@ def chat():
         response.headers['Content-ype'] = 'text/html'
         response.headers['X-Content-Type-Options'] = 'nosniff'
         return response
-        
-        
+
+
 @app.route("/register", methods=['POST'])
 def register():
     username = request.form.get('reg-username')
@@ -390,8 +390,8 @@ def register():
     except mysql.connector.Error as e:
         print(f"Error: {e}")
     create_table_query = """CREATE TABLE IF NOT EXISTS user (
-        id INT AUTO_INCREMENT PRIMARY KEY, 
-        username VARCHAR(255) NOT NULL, 
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(255) NOT NULL,
         password VARCHAR(255) NOT NULL,
         auth_token VARCHAR(255) NOT NULL
         );"""
@@ -430,7 +430,7 @@ def register():
             return render_template('index.html', register_error=register_error)
 
 
-@app.route("/login",methods=['POST'])          
+@app.route("/login",methods=['POST'])
 def login():
     username = request.form.get('log-username')
     password = request.form.get('log-password')
