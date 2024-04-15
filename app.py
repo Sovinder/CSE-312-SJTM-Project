@@ -10,9 +10,15 @@ from flask import jsonify
 import bcrypt
 import mysql.connector
 import hashlib
+from flask_socketio import SocketIO
+from flask_socketio import emit
+
 
 
 app = Flask(__name__,static_url_path='/static')
+socketio = SocketIO(app)
+
+
 
 @app.after_request
 def add_headers(response):
@@ -254,12 +260,17 @@ def update_chat():
     response = jsonify(data)
     return response
 
-@app.route("/chat-message",methods=['POST'])
-def chat_message():
-    username="Guest"
-    username = request.form.get('username')
-    team = request.form.get('team')
-    message = request.form.get('message')
+
+#@app.route("/chat-message",methods=['POST'])
+@socketio.on('message')
+def chat_message(data):
+    #username="Guest"
+    username = data['username']
+    message = data['message']
+    team = data['team']
+    #username = request.form.get('username')
+    #team = request.form.get('team')
+    #message = request.form.get('message')
     user_type_cookie = request.cookies.get('auth')
     if(user_type_cookie=="0" or user_type_cookie==0):
         user_type_cookie=None
@@ -302,6 +313,7 @@ def chat_message():
             values = (last_inserted_id,'0')
             cursor.execute(insert_likes, values)
             conn.commit()
+        emit('new_message', {'message': message,'username':username, 'team':team}, broadcast=True)
         conn.commit()
         cursor.close()
         conn.close()
@@ -365,6 +377,14 @@ def chat():
             result = cursor.fetchall()
         except:
             result = []
+        query = "SELECT * FROM profiles WHERE username=%s"
+        values = (username,)
+        cursor.execute(query,values)
+        result = cursor.fetchall()
+        try:
+            profile = result[0][1]
+        except:
+            profile=''
         conn.commit()
         cursor.close()
         conn.close()
@@ -508,4 +528,4 @@ def logout():
         return response
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0",port=8080,debug=False)
+    socketio.run(app, host="0.0.0.0", port=8080)

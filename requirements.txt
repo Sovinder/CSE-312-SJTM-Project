@@ -3,3 +3,4 @@ mysql-connector-python
 flask
 password-strength
 bcrypt
+flask-socketio

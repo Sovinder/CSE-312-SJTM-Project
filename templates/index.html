@@ -40,7 +40,11 @@
         <div class="logged-in">
           <p class="labels23">Welcome, {{name}}</p>
           <p class="labels23">Team: {{team}}</p>
-          <p class="label3">Need a team?</p>
+          <form action="/profile" class="profile-form" method="post" enctype="multipart/form-data">
+            <input type="file" name="profilePic" id="profilePic"/>
+            <img id="preview" class="null" src={{profile}}/>
+            <button type="submit" class="profile-button">Upload Profile Picture</button>
+          </form>
           <label class="label3">Find a team below!</label>
           <form action="/chat" method="POST">
             <button class="button-design2" type="submit" onclick="updateChatRoom()">Find a Team/Chat</button>
@@ -94,6 +98,8 @@
     <p class="label345">About Us</p>
   </div>
 </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
 	<script src="../static/functions.js"></script>
   </body>
 </html>
