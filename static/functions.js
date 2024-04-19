@@ -27,11 +27,12 @@ function updateChatRoom() {
             const message = JSON.parse(this.response);
             messages = message['messages'];
             likes = message['likes'];
+            profiles = message['profiles'];
             var chatRoom = document.getElementById('chat-room');
             chatRoom.innerHTML = ''; // Clear existing messages
-
             // Append the new messages to the chat room
             messages.forEach(function(message) {
+                profile_path='';
                 let count = 0;
                 likes.forEach(function(like){
                     var messageId = message[0];
@@ -40,8 +41,20 @@ function updateChatRoom() {
                         count = like[1];
                     }
                 })
+                profiles.forEach(function(profile){
+                    var username=message[1];
+                    if(username == profile[0]){
+                        profile_path = profile[1];
+                    }
+                })
                 var div_element = document.createElement('div');
                 div_element.className = "chat-chat";
+
+                var pic = document.createElement('img');
+                pic.src = profile_path;
+                pic.className='chat-image';
+                div_element.appendChild(pic);
+
                 //form creation for the post request
                 var like_form = document.createElement('form');
                 like_form.setAttribute('method','POST');
@@ -54,6 +67,7 @@ function updateChatRoom() {
                 id_field.setAttribute('value',message[0]);
                 id_field.setAttribute('name','id');
                 like_form.appendChild(id_field);
+
 
                 var paragraph = document.createElement('p');
                 paragraph.className = 'user-message';
@@ -116,6 +130,11 @@ function appendMessageToChatRoom(data) {
     like_form.setAttribute('method', 'POST');
     like_form.setAttribute('action', '/like');
     like_form.className = "like-form";
+
+    var pic = document.createElement('img');
+    pic.src = data.profile;
+    pic.className='chat-image';
+    div_element.appendChild(pic);
 
     var id_field = document.createElement('input');
     id_field.setAttribute('type', 'hidden');

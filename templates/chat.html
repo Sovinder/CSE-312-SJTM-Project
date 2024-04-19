@@ -19,6 +19,7 @@
               <p class="chat-room-text">Chat Room</p>
                 <div class="chat-room" id="chat-room">
                   {% for message in messages %}
+                  <img src={{profile}} class="chat-image"/>
                     <p class="user-message">{{ message[1] }} | Team {{ message[2] }}: {{ message[3] }}</p>
                   {% endfor %}
                 </div>

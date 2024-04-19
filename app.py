@@ -54,6 +54,10 @@ def home():
                 username = user[1]
                 break
         conn.commit()
+        #cursor.execute("DROP TABLE IF EXISTS profiles")
+        #cursor.execute("DROP TABLE IF EXISTS user_likes")
+        #cursor.execute("DROP TABLE IF EXISTS messages")
+        #cursor.execute("DROP TABLE IF EXISTS likes")
         create_table = "CREATE TABLE IF NOT EXISTS profiles (username TEXT, path TEXT)"
         cursor.execute(create_table)
         conn.commit()
@@ -113,7 +117,8 @@ def profile():
         if file.filename =='':
             return 404,'No selected file'
         else:
-            num = count_files_in_folder("../static/profiles")
+            num = count_files_in_folder("static/profiles")
+            print("Files: ",num)
             file_path = 'static/profiles/image' + str(num)
             file_bytes = file.read()
             with open(file_path, 'wb') as f:
@@ -247,15 +252,20 @@ def update_chat():
         like_query = "SELECT * FROM likes"
         cursor.execute(like_query)
         result2 = cursor.fetchall()
+        query = "SELECT * FROM profiles"
+        cursor.execute(query)
+        result3 = cursor.fetchall()
     except:
         result = []
         result2 = []
+        result3=[]
     conn.commit()
     cursor.close()
     conn.close()
     data  = {
         'messages':result,
-        'likes':result2
+        'likes':result2,
+        'profiles':result3
     }
     response = jsonify(data)
     return response
@@ -313,7 +323,15 @@ def chat_message(data):
             values = (last_inserted_id,'0')
             cursor.execute(insert_likes, values)
             conn.commit()
-        emit('new_message', {'message': message,'username':username, 'team':team}, broadcast=True)
+            query = "SELECT * FROM profiles WHERE username=%s"
+            values = (username,)
+            cursor.execute(query,values)
+            result = cursor.fetchall()  
+            try:
+                profile = result[0][1]
+            except:
+                profile=''
+        emit('new_message', {'message': message,'username':username, 'team':team,'profile':profile}, broadcast=True)
         conn.commit()
         cursor.close()
         conn.close()

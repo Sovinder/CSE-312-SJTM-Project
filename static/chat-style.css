@@ -192,3 +192,8 @@ body{
     height:auto;
     border-radius:10px;
 }
+.chat-image{
+    width:30px;
+    height:auto;
+    border-radius: 30%;
+}
