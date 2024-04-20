@@ -7,8 +7,8 @@ COPY . .
 
 RUN pip3 install -r requirements.txt
 
-EXPOSE 8080
+EXPOSE 9090
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.2.1/wait /wait
 RUN chmod +x /wait
 
-CMD /wait && python3 -m flask run --host=0.0.0.0 --port=8080
+CMD /wait && python3 -m flask run --host=0.0.0.0 --port=9090
