@@ -112,11 +112,11 @@ def profile():
         user_type_cookie = None
     #ADDING A NEW TABLE FOR ALL PROFILE PIC PATHS
     if 'profilePic' not in request.files:
-        return 404, 'No file uploaded'
+        return redirect("/")
     else:
         file = request.files['profilePic']
         if file.filename =='':
-            return 404,'No selected file'
+            return redirect("/")
         else:
             create_directory("static/profiles")
             num = count_files_in_folder("static/profiles")
