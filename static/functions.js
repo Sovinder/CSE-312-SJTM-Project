@@ -170,10 +170,13 @@ setInterval(pollChat, 4000);
 pollChat();
 
 function sendMessage() {
-    const message = document.getElementById("message-box").value;
+    const textbox = document.getElementById("message-box");
+    const message = textbox.value;
+    textbox.value = "";
     const username = document.getElementById("username-input").value;
     const team = document.getElementById("team-input").value;
     console.log(username);
     // Send the message to the server via WebSocket
     socket.emit('message', { message: message,username:username,team:team });
+    message.value = "";
 }
