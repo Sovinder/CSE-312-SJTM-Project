@@ -42,6 +42,16 @@ def home():
                 database = 'db'
             )
             cursor = conn.cursor()
+                        # Create 'user' table if it doesn't exist
+            create_table_query = """CREATE TABLE IF NOT EXISTS user (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                username VARCHAR(255) NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                auth_token VARCHAR(255) NOT NULL
+            );"""
+            cursor.execute(create_table_query)
+            conn.commit()
+            
         except mysql.connector.Error as e:
             print(f"Error: {e}")
         query = "SELECT * FROM user"
