@@ -18,5 +18,10 @@ def generate_auth_token(length:int):
 
 def count_files_in_folder(folder_path):
     if not os.path.exists(folder_path) or not os.path.isdir(folder_path):
+
         return 0
     return len(os.listdir(folder_path))
+
+def create_directory(directory_path):
+    if not os.path.exists(directory_path):
+        os.makedirs(directory_path)

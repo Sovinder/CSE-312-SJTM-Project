@@ -6,6 +6,7 @@ from flask import redirect
 from util import validate_password
 from util import generate_auth_token
 from util import count_files_in_folder
+from util import create_directory
 from flask import jsonify
 import bcrypt
 import mysql.connector
@@ -117,6 +118,7 @@ def profile():
         if file.filename =='':
             return 404,'No selected file'
         else:
+            create_directory("static/profiles")
             num = count_files_in_folder("static/profiles")
             print("Files: ",num)
             file_path = 'static/profiles/image' + str(num)
