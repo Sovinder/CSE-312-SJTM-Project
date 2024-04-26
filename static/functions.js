@@ -109,8 +109,19 @@ socket.on('connect', function() {
 socket.on('new_message', function(data) {
     // Handle the new message received from the server
     console.log('Received new message:', data);
+    if(data.messageType == 'message'){
     // Update the chat room with the new message and likes
-    appendMessageToChatRoom(data);
+        appendMessageToChatRoom(data);
+    }
+    else if(data.messageType == 'timer'){
+        var timer = document.getElementById('chat-cooldown');
+        timer.textContent = 'Cooldown: ' + data.seconds + ' seconds';
+    }
+    else if(data.messageType=='cooldown'){
+        console.log("Cooldown");
+        var chat = document.getElementById('chat-room-text');
+        chat.textContent = data.message;
+    }
 });
 
         

@@ -13,9 +13,11 @@ import mysql.connector
 import hashlib
 from flask_socketio import SocketIO
 from flask_socketio import emit
+from datetime import datetime, timedelta
+import time
 
 
-
+cooldowns = []
 app = Flask(__name__,static_url_path='/static')
 socketio = SocketIO(app)
 
@@ -343,7 +345,20 @@ def chat_message(data):
                 profile = result[0][1]
             except:
                 profile=''
-        emit('new_message', {'message': message,'username':username, 'team':team,'profile':profile}, broadcast=True)
+        if username not in cooldowns:
+            emit('new_message', {'message': message,'username':username, 'team':team,'profile':profile,'messageType':'message'}, broadcast=True)
+            cooldowns.append(username)
+        else:
+            emit('new_message', {'message': 'You are on a cooldown. Please wait for 10 seconds.','messageType':'cooldown'}, broadcast=True)
+            return
+        seconds_elapsed = 11
+        while seconds_elapsed >=1:
+            seconds_elapsed -= 1
+            time.sleep(1)
+            emit('new_message', {'seconds':seconds_elapsed,'messageType':'timer'}, broadcast=True)
+        cooldowns.remove(username)
+        emit('new_message', {'seconds':'','messageType':'timer'}, broadcast=True)
+        emit('new_message', {'message': 'Good to Go! Send another message!','messageType':'cooldown'}, broadcast=True)
         conn.commit()
         cursor.close()
         conn.close()

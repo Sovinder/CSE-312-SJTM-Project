@@ -16,7 +16,7 @@
         </div>
         <div class="chat-body">
           <div class="chat-left">
-              <p class="chat-room-text">Chat Room</p>
+              <p class="chat-room-text" id="chat-room-text">Chat Room</p>
                 <div class="chat-room" id="chat-room">
                   {% for message in messages %}
                   <img src={{profile}} class="chat-image"/>
@@ -28,6 +28,7 @@
                 <input id="username-input" name="username" value={{name}} type="hidden"/>
                 <input id="team-input" name="team" value={{team}} type="hidden"/>
                 <button type="submit" onclick="sendMessage()" name="chat-buttton" id="chat-btn" class="chat-button">Send</button>
+                <p class="chat-cooldown" id="chat-cooldown">Cooldown:</p>
               </div>
           </div>
           <div class="chat-right">
