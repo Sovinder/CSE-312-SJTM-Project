@@ -32,6 +32,7 @@ def add_headers(response):
 def home():
     username="Guest"
     path="None"
+    team="None"
     user_type_cookie = request.cookies.get('auth')
     if(user_type_cookie=="0" or user_type_cookie==0):
         user_type_cookie=None
@@ -52,6 +53,9 @@ def home():
                 auth_token VARCHAR(255) NOT NULL
             );"""
             cursor.execute(create_table_query)
+            conn.commit()
+            query = "CREATE TABLE IF NOT EXISTS user_teams (teamName TEXT, username TEXT,team_id INT)"
+            cursor.execute(query)
             conn.commit()
             
         except mysql.connector.Error as e:
@@ -82,17 +86,204 @@ def home():
             path = result[0][1]
         else:
             path = "../static/null.png"
+        query = "SELECT * FROM user_teams WHERE username=%s"
+        values = (username,)
+        cursor.execute(query,values)
+        result = cursor.fetchall()
+        if len(result) > 0:
+            team = result[0][0]
+        else:
+            team = "None"
         conn.commit()
         cursor.close()
         conn.close()
     if username == '':
         user_type_cookie = None
         path = "None"
-    response = make_response(render_template('index.html',user_type=user_type_cookie,name=username,team="None",profile=path))
+    
+    response = make_response(render_template('index.html',user_type=user_type_cookie,name=username,team=team,profile=path))
     response.headers['Content-Type'] = 'text/html'
     response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
+@app.route("/create",methods=['POST','GET'])
+def create():
+    if request.method == 'GET':
+        username="Guest"
+        path="None"
+        user_type_cookie = request.cookies.get('auth')
+        if(user_type_cookie=="0" or user_type_cookie==0):
+            user_type_cookie=None
+        if user_type_cookie != None:
+            try:
+                conn = mysql.connector.connect(
+                    user = 'user',
+                    password = 'password',
+                    host = 'db',
+                    database = 'db'
+                )
+                cursor = conn.cursor()
+                            # Create 'user' table if it doesn't exist
+                create_table_query = """CREATE TABLE IF NOT EXISTS user (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    username VARCHAR(255) NOT NULL,
+                    password VARCHAR(255) NOT NULL,
+                    auth_token VARCHAR(255) NOT NULL
+                );"""
+                cursor.execute(create_table_query)
+                conn.commit()
+                
+            except mysql.connector.Error as e:
+                print(f"Error: {e}")
+            query = "SELECT * FROM user"
+            cursor.execute(query)
+            result = cursor.fetchall()
+            username =''
+            print(result)
+            for user in result:
+                print(user)
+                if(hashlib.sha256(user_type_cookie.encode('utf-8')).hexdigest() == user[3]):
+                    username = user[1]
+                    break
+            conn.commit()
+            cursor.close()
+            conn.close()
+        if username == '':
+            user_type_cookie = None
+            path = "None"
+        response = make_response(render_template('create_team.html',username=username))
+        response.headers['Content-Type'] = 'text/html'
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        return response
+    else:
+        username = request.form.get('username')
+        teamName = request.form.get('teamName')
+        sport = request.form.get('sport')
+        num = request.form.get('numMembers')
+        try:
+            conn = mysql.connector.connect(
+                user = 'user',
+                password = 'password',
+                host = 'db',
+                database = 'db'
+            )
+            cursor = conn.cursor()
+        except mysql.connector.Error as e:
+            print(f"Error: {e}")
+        if username == "Guest":
+            return redirect('/')
+        else:
+            query = "CREATE TABLE IF NOT EXISTS teams (team_name TEXT, team_leader TEXT, team_members INT, sport TEXT,team_id INT PRIMARY KEY AUTO_INCREMENT)"
+            cursor.execute(query)
+            conn.commit()
+            query = "SELECT * FROM teams WHERE team_leader=%s"
+            values = (username,)
+            cursor.execute(query,values)
+            result = cursor.fetchall()
+            if len(result) > 0:
+                return redirect('/')
+            else:
+                query = "INSERT INTO teams (team_name,team_leader,team_members,sport) VALUES (%s,%s,%s,%s)"
+                values = (teamName,username,num,sport)
+                cursor.execute(query,values)
+                conn.commit()
+                query = "INSERT INTO user_teams (teamName,username,team_id) VALUES (%s,%s,%s)"
+                values = (teamName,username,cursor.lastrowid)
+                cursor.execute(query,values)
+                conn.commit()
+                cursor.close()
+                conn.close()
+                return redirect('/create')
+
+@app.route("/join",methods=['POST','GET'])
+def join():
+    if request.method == 'GET':
+        username="Guest"
+        path="None"
+        user_type_cookie = request.cookies.get('auth')
+        if(user_type_cookie=="0" or user_type_cookie==0):
+            user_type_cookie=None
+        if user_type_cookie != None:
+            try:
+                conn = mysql.connector.connect(
+                    user = 'user',
+                    password = 'password',
+                    host = 'db',
+                    database = 'db'
+                )
+                cursor = conn.cursor()
+            except mysql.connector.Error as e:
+                print(f"Error: {e}")
+                            # Create 'user' table if it doesn't exist
+            create_table_query = """CREATE TABLE IF NOT EXISTS user (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                username VARCHAR(255) NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                auth_token VARCHAR(255) NOT NULL
+            );"""
+            cursor.execute(create_table_query)
+            conn.commit()
+                
+            query = "SELECT * FROM user"
+            cursor.execute(query)
+            result = cursor.fetchall()
+            username =''
+            print(result)
+            for user in result:
+                print(user)
+                if(hashlib.sha256(user_type_cookie.encode('utf-8')).hexdigest() == user[3]):
+                    username = user[1]
+                    break
+            conn.commit()
+        if username == '':
+            user_type_cookie = None
+            path = "None"
+        query = "SELECT * FROM teams"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        response = make_response(render_template('join_team.html',username=username,teams=result))
+        response.headers['Content-Type'] = 'text/html'
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        return response
+    else:
+        username = request.form.get('username')
+        id = request.form.get('id')
+        max = request.form.get('max')
+        teamName = request.form.get('teamName')
+        try:
+            conn = mysql.connector.connect(
+                user = 'user',
+                password = 'password',
+                host = 'db',
+                database = 'db'
+            )
+            cursor = conn.cursor()
+        except mysql.connector.Error as e:
+            print(f"Error: {e}")
+        if username == "Guest":
+            return redirect('/')
+        else:
+            query = "CREATE TABLE IF NOT EXISTS user_teams (teamName TEXT, username TEXT,team_id INT)"
+            cursor.execute(query)
+            conn.commit()
+            query = "SELECT * FROM user_teams WHERE team_id=%s"
+            values = (id,)
+            cursor.execute(query,values)
+            result = cursor.fetchall()
+            if len(result) >= int(max):
+                return redirect('/')
+            else:
+                query = "INSERT INTO user_teams (teamName,username,team_id) VALUES (%s,%s,%s)"
+                values = (teamName,username,id)
+                cursor.execute(query,values)
+                conn.commit()
+                cursor.close()
+                conn.close()
+                return redirect('/')
+
+              
 @app.route("/profile",methods=['POST'])
 def profile():
     user_type_cookie = request.cookies.get('auth')
@@ -430,6 +621,14 @@ def chat():
             profile = result[0][1]
         except:
             profile=''
+        query = "SELECT * FROM user_teams WHERE username=%s"
+        values = (username,)
+        cursor.execute(query,values)
+        result = cursor.fetchall()
+        if len(result) > 0:
+            team = result[0][0]
+        else:
+            team = "None"
         conn.commit()
         cursor.close()
         conn.close()

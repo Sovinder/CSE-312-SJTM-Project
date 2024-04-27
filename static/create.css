@@ -1,0 +1,62 @@
+.create-team-form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 50px;
+}
+.create-team-form input{
+    width: 300px;
+    height: 30px;
+    margin: 10px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+.create-team-form button{
+    width: 300px;
+    height: 30px;
+    margin: 10px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+.create-team-form button:hover{
+    background-color: #0056b3;
+}
+.banner{
+    width:100vw;
+    height:7vw;
+    background-color: #00ABE4;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+.title-text{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 30px;
+    color:white;
+}
+.body-div{
+    width:100vw;
+    height:100vh;
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.back-button {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #abeaff;
+    color: #000000;
+    border-radius: 5px;
+    cursor: pointer;
+}
