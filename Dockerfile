@@ -11,4 +11,4 @@ EXPOSE 9090
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.2.1/wait /wait
 RUN chmod +x /wait
 
-CMD /wait && python3 -m flask run --host=0.0.0.0 --port=9090
+CMD /wait && python3 -m flask run --host=0.0.0.0 --port=8080

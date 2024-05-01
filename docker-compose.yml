@@ -14,4 +14,4 @@ services:
   app:
     build: .
     ports:
-      - "9090:9090"
+      - "8080:8080"
