@@ -15,6 +15,7 @@ from flask_socketio import SocketIO
 from flask_socketio import emit
 from datetime import datetime, timedelta
 import time
+from flask_socketio import join_room, leave_room
 
 
 cooldowns = []
@@ -540,16 +541,16 @@ def chat_message(data):
             emit('new_message', {'message': message,'username':username, 'team':team,'profile':profile,'messageType':'message'}, broadcast=True)
             cooldowns.append(username)
         else:
-            emit('new_message', {'message': 'You are on a cooldown. Please wait for 10 seconds.','messageType':'cooldown'}, broadcast=True)
+            emit('new_message', {'message': 'You are on a cooldown. Please wait for 10 seconds.','messageType':'cooldown'}, room=request.sid)
             return
         seconds_elapsed = 11
         while seconds_elapsed >=1:
             seconds_elapsed -= 1
             time.sleep(1)
-            emit('new_message', {'seconds':seconds_elapsed,'messageType':'timer'}, broadcast=True)
+            emit('new_message', {'seconds':seconds_elapsed,'messageType':'timer'}, room=request.sid)
         cooldowns.remove(username)
-        emit('new_message', {'seconds':'','messageType':'timer'}, broadcast=True)
-        emit('new_message', {'message': 'Good to Go! Send another message!','messageType':'cooldown'}, broadcast=True)
+        emit('new_message', {'seconds':'','messageType':'timer'}, room=request.sid)
+        emit('new_message', {'message': 'Good to Go! Send another message!','messageType':'cooldown'}, room=request.sid)
         conn.commit()
         cursor.close()
         conn.close()

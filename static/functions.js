@@ -177,8 +177,9 @@ function appendMessageToChatRoom(data) {
 function pollChat() {
    updateChatRoom(); 
 }
-setInterval(pollChat, 4000);
+setInterval(pollChat, 11000);
 pollChat();
+updateChatRoom();
 
 function sendMessage() {
     const textbox = document.getElementById("message-box");
