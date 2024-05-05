@@ -16,11 +16,13 @@ from flask_socketio import emit
 from datetime import datetime, timedelta
 import time
 from flask_socketio import join_room, leave_room
+import threading
 
 
-cooldowns = []
+#cooldowns = []
 app = Flask(__name__,static_url_path='/static')
 socketio = SocketIO(app)
+cooldowns = {}
 
 
 
@@ -476,87 +478,107 @@ def update_chat():
     response = jsonify(data)
     return response
 
+  # Dictionary to store cooldown expiration times for each user
 
-#@app.route("/chat-message",methods=['POST'])
+def remove_from_cooldown(username):
+    del cooldowns[username]
+
+def cooldown_countdown(username, seconds_remaining, sid):
+    if seconds_remaining >= 1:
+        socketio.emit('new_message', {'seconds': seconds_remaining, 'messageType': 'timer'}, room=sid)
+        seconds_remaining -= 1
+        threading.Timer(1, cooldown_countdown, args=[username, seconds_remaining, sid]).start()
+    else:
+        #remove_from_cooldown(username)
+        socketio.emit('new_message', {'seconds': '', 'messageType': 'timer'}, room=sid)
+        socketio.emit('new_message', {'message': 'Good to Go! Send another message!', 'messageType': 'cooldown'}, room=sid)
+
 @socketio.on('message')
 def chat_message(data):
-    #username="Guest"
     username = data['username']
     message = data['message']
     team = data['team']
-    #username = request.form.get('username')
-    #team = request.form.get('team')
-    #message = request.form.get('message')
+    sid = request.sid  # Extract the sid from the request context
+
+    # Check if user is in cooldown
+    if username in cooldowns:
+        socketio.emit('new_message', {'message': 'You are on a cooldown. Please wait before sending another message.', 'messageType': 'cooldown'}, room=sid)
+        return
+
     user_type_cookie = request.cookies.get('auth')
-    if(user_type_cookie=="0" or user_type_cookie==0):
-        user_type_cookie=None
-    if user_type_cookie != None:
+    if user_type_cookie == "0" or user_type_cookie == 0:
+        user_type_cookie = None
+
+    if user_type_cookie is not None:
         try:
             conn = mysql.connector.connect(
-                user = 'user',
-                password = 'password',
-                host = 'db',
-                database = 'db'
+                user='user',
+                password='password',
+                host='db',
+                database='db'
             )
             cursor = conn.cursor()
+
+            query = "SELECT * FROM user"
+            cursor.execute(query)
+            result = cursor.fetchall()
+            username = ''
+            for user in result:
+                if hashlib.sha256(user_type_cookie.encode('utf-8')).hexdigest() == user[3]:
+                    username = user[1]
+                    break
+
+            if username != "Guest":
+                create_table = "CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTO_INCREMENT,username TEXT NOT NULL,team TEXT NOT NULL,message TEXT NOT NULL);"
+                cursor.execute(create_table)
+                conn.commit()
+
+                create_like_table = "CREATE TABLE IF NOT EXISTS likes (id INTEGER PRIMARY KEY, count INTEGER);"
+                cursor.execute(create_like_table)
+                conn.commit()
+
+                insert_query = "INSERT INTO messages (username, team,message) VALUES (%s,%s,%s);"
+                values = (username, team, message)
+                cursor.execute(insert_query, values)
+                conn.commit()
+
+                last_inserted_id = cursor.lastrowid
+                insert_likes = "INSERT INTO likes (id, count) VALUES (%s,%s);"
+                values = (last_inserted_id, '0')
+                cursor.execute(insert_likes, values)
+                conn.commit()
+
+                query = "SELECT * FROM profiles WHERE username=%s"
+                values = (username,)
+                cursor.execute(query, values)
+                result = cursor.fetchall()
+
+                try:
+                    profile = result[0][1]
+                except:
+                    profile = ''
+                emit('new_message', {'message': message, 'username': username, 'team': team, 'profile': profile, 'messageType': 'message'}, broadcast=True)
+
+
+                
+                # Add the user to the cooldowns dictionary with a timer for 10 seconds
+                cooldowns[username] = threading.Timer(10, remove_from_cooldown, args=[username])
+                cooldowns[username].start()
+
+                # Start countdown timer for cooldown
+                threading.Timer(1, cooldown_countdown, args=[username, 10, sid]).start()
+
+
         except mysql.connector.Error as e:
             print(f"Error: {e}")
-        query = "SELECT * FROM user"
-        cursor.execute(query)
-        result = cursor.fetchall()
-        username =''
-        for user in result:
-            if(hashlib.sha256(user_type_cookie.encode('utf-8')).hexdigest() == user[3]):
-                username = user[1]
-                break
-        if(username!="Guest"):
-            #CREATING THE MESSAGES TABLE THAT EACH HAVE A SPECIFIC ID
-            create_table = "CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTO_INCREMENT,username TEXT NOT NULL,team TEXT NOT NULL,message TEXT NOT NULL);"
-            cursor.execute(create_table)
-            conn.commit()
-            #CREATING THE LIKE TABLE THAT WILL USE THE SPECIFIC ID AND HAVE LIKE COUNTER
-            create_like_table = "CREATE TABLE IF NOT EXISTS likes (id INTEGER PRIMARY KEY, count INTEGER);"
-            cursor.execute(create_like_table)
-            conn.commit()
-            #INSERTING A MESSAGE
-            insert_query = "INSERT INTO messages (username, team,message) VALUES (%s,%s,%s);"
-            values = (username, team, message)
-            cursor.execute(insert_query, values)
-            conn.commit()
-            #TAKING THE NEW MESSAGE ID AND ESTABLISHING ZERO LIKES IN LIKE TABLE
-            last_inserted_id = cursor.lastrowid
-            insert_likes = "INSERT INTO likes (id, count) VALUES (%s,%s);"
-            values = (last_inserted_id,'0')
-            cursor.execute(insert_likes, values)
-            conn.commit()
-            query = "SELECT * FROM profiles WHERE username=%s"
-            values = (username,)
-            cursor.execute(query,values)
-            result = cursor.fetchall()  
-            try:
-                profile = result[0][1]
-            except:
-                profile=''
-        if username not in cooldowns:
-            emit('new_message', {'message': message,'username':username, 'team':team,'profile':profile,'messageType':'message'}, broadcast=True)
-            cooldowns.append(username)
-        else:
-            emit('new_message', {'message': 'You are on a cooldown. Please wait for 10 seconds.','messageType':'cooldown'}, room=request.sid)
-            return
-        seconds_elapsed = 11
-        while seconds_elapsed >=1:
-            seconds_elapsed -= 1
-            time.sleep(1)
-            emit('new_message', {'seconds':seconds_elapsed,'messageType':'timer'}, room=request.sid)
-        cooldowns.remove(username)
-        emit('new_message', {'seconds':'','messageType':'timer'}, room=request.sid)
-        emit('new_message', {'message': 'Good to Go! Send another message!','messageType':'cooldown'}, room=request.sid)
-        conn.commit()
-        cursor.close()
-        conn.close()
-        return redirect('/chat')
+        finally:
+            cursor.close()
+            conn.close()
+
     else:
         return redirect("/")
+
+    return redirect('/chat')
 
 @app.route("/chat",methods=['POST','GET'])
 def chat():
