@@ -163,6 +163,10 @@ def create():
         teamName = request.form.get('teamName')
         sport = request.form.get('sport')
         num = request.form.get('numMembers')
+        username = username.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
+        teamName = teamName.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
+        sport = sport.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
+        #num = num.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
         try:
             conn = mysql.connector.connect(
                 user = 'user',
