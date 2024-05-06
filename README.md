@@ -18,7 +18,7 @@ the creation of more complex forms and Jinja2 to correctly format and display th
     1. Navigate to https://csesjtm.com/
         a. If the deployed website is not working, work locally by using docker compose up.
         b. Navigate the localhost:8080 if locally.
-    2. Register and Log in.
+    2. Register and login.
     3. Navigate the "Create a Team".
         b. Assert that a page with a form is displayed.
         c. Fill in the form and submit.
@@ -26,7 +26,7 @@ the creation of more complex forms and Jinja2 to correctly format and display th
     4. Navigate to the "Join a Team" page.
         a. Assert that the created team is now displayed.
         b. Send a chat message in chat room and verify that the team name appears next to username.
-    5. Logout and register/login to a different account
+    5. Open a different browser, register and login with a different account.
     6. Navigate to the "Join a Team"' page again.
         a. Verify that the team is still displayed.
     7. With this new user, join the team.
