@@ -1,11 +1,13 @@
-.create-team-form{
+.create-team-form {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     margin-top: 50px;
 }
-.create-team-form input{
+
+.create-team-form input,
+.create-team-form select {
     width: 300px;
     height: 30px;
     margin: 10px;
@@ -13,7 +15,8 @@
     border-radius: 5px;
     border: 1px solid #ccc;
 }
-.create-team-form button{
+
+.create-team-form button {
     width: 300px;
     height: 30px;
     margin: 10px;
@@ -24,34 +27,37 @@
     color: white;
     cursor: pointer;
 }
-.create-team-form button:hover{
+
+.create-team-form button:hover {
     background-color: #0056b3;
 }
-.banner{
-    width:100vw;
-    height:7vw;
+
+.banner {
+    width: 100vw;
+    height: 7vw;
     background-color: #00ABE4;
-    display:flex;
+    display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: row;
 }
 
-.title-text{
+.title-text {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 30px;
-    color:white;
+    color: white;
 }
-.body-div{
-    width:100vw;
-    height:100vh;
-    display:flex;
+
+.body-div {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
     flex-direction: column;
     justify-content: center;
 }
+
 .back-button {
-    position: fixed;
-    top: 10px;
+    position: absolute;
     right: 10px;
     display: inline-block;
     padding: 10px 20px;
@@ -59,4 +65,17 @@
     color: #000000;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.create-team-form select {
+    appearance: none; /* Removes default dropdown arrow */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); /* Adds custom dropdown arrow */
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 20px auto;
+}
+
+.create-team-form select:focus {
+    outline: none;
+    border-color: #007bff;
 }

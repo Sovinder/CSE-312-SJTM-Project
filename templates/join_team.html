@@ -15,7 +15,7 @@
 </div>
 <div class="body-div">
     {% if teams %}
-        <p>All Teams:</p>
+        <p class="all-teams">All Teams:</p>
         {% for team in teams %}
             <form class="join-team-form" action="/join" method="POST">
                 <label class="join-label">Name: {{team[0]}}</label>

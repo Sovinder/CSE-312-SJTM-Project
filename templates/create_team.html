@@ -1,31 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>CSE312 Website</title>
-    <link rel="stylesheet" href="../static/create.css">
-    <link rel="icon" href="../favicon.ico" type="image/x-icon">
-  </head>
-  <body>
-    <div class="body-div">
-        <div class="banner">
-          <p class="title-text">IntraLeagues</p>
-          <a href="/" class="back-button">Back</a>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>CSE312 Website</title>
+        <link rel="stylesheet" href="../static/create.css">
+        <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+        <div class="body-div">
+            <div class="banner">
+                <p class="title-text">IntraLeagues</p>
+                <a href="/" class="back-button">Back</a>
+            </div>
+            <form class="create-team-form" action="/create" method="POST"> Create a Team
+                <label class="create-label">Team Name</label>
+                <input class="create-input" type="text" name="teamName" required>
+                <label class="create-label">Sport</label>
+                <select class="create-input" name="sport" required>
+                    <option value="Basketball">Basketball</option>
+                    <option value="Soccer">Soccer</option>
+                    <option value="Volleyball">Volleyball</option>
+                    <option value="Hockey">Hockey</option>
+                    <option value="Football">Football</option>
+                </select>
+                <label class="create-label">Number of Members</label>
+                <input class="create-input" type="number" name="numMembers" required>
+                <input type="hidden" name="username" value={{username}}>
+                <button class="create-button" type="submit">Create Team</button>
+            </form>
         </div>
-        <form class="create-team-form" action="/create" method="POST"> Create a Team
-            <label class="create-label">Team Name</label>
-            <input class="create-input" type="text" name="teamName" required>
-            <label class="create-label">Sport</label>
-            <input class="create-input" type="text" name="sport" required>
-            <label class="create-label">Number of Members</label>
-            <input class="create-input" type="number" name="numMembers" required>
-            <input type="hidden" name="username" value={{username}}>
-            <button class="create-button" type="submit">Create Team</button>
-        </form>
-    </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
-	<script src="../static/functions.js"></script>
-  </body>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
+        <script src="../static/functions.js"></script>
+    </body>
 </html>
