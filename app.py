@@ -60,7 +60,7 @@ def home():
             query = "CREATE TABLE IF NOT EXISTS user_teams (teamName TEXT, username TEXT,team_id INT)"
             cursor.execute(query)
             conn.commit()
-            
+
         except mysql.connector.Error as e:
             print(f"Error: {e}")
         query = "SELECT * FROM user"
@@ -103,7 +103,7 @@ def home():
     if username == '':
         user_type_cookie = None
         path = "None"
-    
+
     response = make_response(render_template('index.html',user_type=user_type_cookie,name=username,team=team,profile=path))
     response.headers['Content-Type'] = 'text/html'
     response.headers['X-Content-Type-Options'] = 'nosniff'
@@ -135,7 +135,7 @@ def create():
                 );"""
                 cursor.execute(create_table_query)
                 conn.commit()
-                
+
             except mysql.connector.Error as e:
                 print(f"Error: {e}")
             query = "SELECT * FROM user"
@@ -230,7 +230,7 @@ def join():
             );"""
             cursor.execute(create_table_query)
             conn.commit()
-                
+
             query = "SELECT * FROM user"
             cursor.execute(query)
             result = cursor.fetchall()
@@ -290,7 +290,7 @@ def join():
                 conn.close()
                 return redirect('/')
 
-              
+
 @app.route("/profile",methods=['POST'])
 def profile():
     user_type_cookie = request.cookies.get('auth')
@@ -564,7 +564,7 @@ def chat_message(data):
                 emit('new_message', {'message': message, 'username': username, 'team': team, 'profile': profile, 'messageType': 'message'}, broadcast=True)
 
 
-                
+
                 # Add the user to the cooldowns dictionary with a timer for 10 seconds
                 cooldowns[username] = threading.Timer(10, remove_from_cooldown, args=[username])
                 cooldowns[username].start()
@@ -735,6 +735,14 @@ def login():
         cursor = conn.cursor()
     except mysql.connector.Error as e:
         print(f"Error: {e}")
+    create_table_query = """CREATE TABLE IF NOT EXISTS user (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(255) NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        auth_token VARCHAR(255) NOT NULL
+        );"""
+    cursor.execute(create_table_query)
+    conn.commit()
     check_account_query = "SELECT * FROM user WHERE username=%s"
     values = (username,)
     cursor.execute(check_account_query,values)
